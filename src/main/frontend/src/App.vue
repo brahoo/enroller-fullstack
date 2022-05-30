@@ -11,7 +11,10 @@
       <meetings-page :username="authenticatedUsername"></meetings-page>
     </div>
     <div v-else>
-      <login-form @login="login($event)"></login-form>
+      <button @click = "registering = false">Zaloguj</button>
+      <button @click = "registering = true">Zarejestruj</button>
+      <login-form v-if=!registering buttonLabel="Zaloguj się" @login="login($event)"></login-form>
+      <login-form v-if=registering buttonLabel="Zarejestruj się" @login="regiser($event)"></login-form>
     </div>
   </div>
 </template>
@@ -25,7 +28,8 @@
         components: {LoginForm, MeetingsPage},
         data() {
             return {
-                authenticatedUsername: ""
+                authenticatedUsername: "",
+                registering: false
             };
         },
         methods: {
@@ -35,6 +39,7 @@
             logout() {
                 this.authenticatedUsername = '';
             }
+
         }
     };
 </script>
