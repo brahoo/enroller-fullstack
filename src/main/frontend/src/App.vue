@@ -11,10 +11,10 @@
       <meetings-page :username="authenticatedUsername"></meetings-page>
     </div>
     <div v-else>
-      <button @click = "registering = false">Zaloguj</button>
-      <button @click = "registering = true">Zarejestruj</button>
-      <login-form v-if=!registering buttonLabel="Zaloguj się" @login="login($event)"></login-form>
-      <login-form v-if=registering buttonLabel="Zarejestruj się" @login="regiser($event)"></login-form>
+	  <div :class = " ' alert alert-' + (this.isError ? 'error' : 'success')" v-if  = "message">{{message}}</div>
+      <button @click = "registering = false" :class = " registering ? 'button-outline' : ''">Zaloguj</button>
+      <button @click = "registering = true" :class = " !registering ? 'button-outline' : ''">Zarejestruj</button>	
+      <login-form @submit = "registering ?  regiser($event) : login($event)"  :button-label = "loginButtonLabel" ></login-form>
     </div>
   </div>
 </template>
@@ -29,7 +29,9 @@
         data() {
             return {
                 authenticatedUsername: "",
-                registering: false
+                registering: false,
+				message: '',
+				isError: false
             };
         },
         methods: {
@@ -38,9 +40,25 @@
             },
             logout() {
                 this.authenticatedUsername = '';
-            }
-
-        }
+            },
+			regiser(user) {
+				this.message = undefined;
+				this.$http.post('participants', user)
+					.then(response => {
+						this.message = 'Rejestracja powiodła się.';
+						this.isError = false;
+					})
+					.catch(response => {
+						this.message = "Rejestracja nie powiodła się! Kod odpowiedzi: " + response.status;
+						this.isError = true;
+					});
+			},
+        },
+		computed: {
+			loginButtonLabel() {
+				return this.registering ? 'Zarejestruj się' : 'Zaloguj się';
+			}
+		}
     };
 </script>
 
@@ -52,6 +70,22 @@
 
   .logo {
     vertical-align: middle;
+  }
+  
+  .alert {
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 2px solid black;
+  }
+  
+  .alert-success {
+	background: lightgreen;
+	border-color: darken(lightgreen,10%);
+  }
+  
+  .alert-error {
+	background: indianred;
+	border-color: darken(indianred,10%);
   }
 </style>
 
