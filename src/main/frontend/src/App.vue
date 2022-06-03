@@ -55,6 +55,8 @@
 			},
             logout() {
                 this.authenticatedUsername = '';
+				delete Vue.http.headers.common.Authorization;
+				localStorage.clear();
             },
 			regiser(user) {
 				this.message = undefined;
@@ -69,6 +71,14 @@
 					});
 			},
         },
+		mounted() {
+			const username = localStorage.getItem('username');
+			const token = localStorage.getItem('token');
+			if (username && token) {
+				this.storeAuth(username, token);
+				this.$http.get('participants/${username}').catch(() =>this.logout());
+			}
+		},
 		computed: {
 			loginButtonLabel() {
 				return this.registering ? 'Zarejestruj się' : 'Zaloguj się';
