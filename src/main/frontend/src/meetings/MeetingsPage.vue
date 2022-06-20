@@ -44,7 +44,7 @@
             addMeetingParticipant(meeting) {
                 this.clearMessage();
 				user = this.$http.get('participants/${username}');
-				this.$http.post('meetings/${meeting}/participants',user)
+				this.$http.post('meetings/${meeting.id}/participants',user)
 					.then(response => {
 						this.success(response.status)
 					})
@@ -77,13 +77,14 @@
 			},
 			getMeetingsParticipants() {
 				for (meeting in this.meetings) {
+					meeting.participants = [];
 					this.$http.get('meetings/' + meeting.id + '/participants')
 					.then (response => {
-						meeting.participants = response.body;
+						meeting.participants = response.body
 					})
-					.catch(response =>this.failure('Błąd przy pobieraniu uczestników. Kod odpowiedzi: ' + response.status));
+					.catch(response =>this.failure('Błąd. Kod odpowiedzi: ' + response.status));
 				}
-			}	
+			}
         },
 		mounted() {
 			this.getMeetings();
