@@ -26,22 +26,67 @@
         props: ['username'],
         data() {
             return {
-                meetings: []
+                meetings: [],
+				message: "",
+				isError: false
             };
         },
         methods: {
             addNewMeeting(meeting) {
-                this.meetings.push(meeting);
-            },
+				this.clearMessage();
+				this.$http.post('meetings', meeting)
+					.then(response => {
+						this.success('Spotkanie zostało utworzone');
+					})
+					.catch(response =>this.failure('Błąd przy tworzeniu spotkania. Kod odpowiedzi: ' + response.status));
+				this.getMeetings();
+			},
             addMeetingParticipant(meeting) {
-                meeting.participants.push(this.username);
+                this.clearMessage();
+				user = this.$http.get('participants/${username}');
+				this.$http.post('meetings/${meeting}/participants',user)
+					.then(response => {
+						this.success(response.status)
+					})
+					.catch(response => this.failure('Błąd przy dodawaniu uczestnika. Kod odpowiedzi: ' + response.status));
+				this.getMeetings();
             },
             removeMeetingParticipant(meeting) {
                 meeting.participants.splice(meeting.participants.indexOf(this.username), 1);
             },
             deleteMeeting(meeting) {
                 this.meetings.splice(this.meetings.indexOf(meeting), 1);
-            }
-        }
+            },
+			success(message) {
+                this.message = message;
+                this.isError = false;
+            },
+            failure(message) {
+                this.message = message;
+                this.isError = true;
+            },
+            clearMessage() {
+                this.message = undefined;
+            },
+			getMeetings() {
+				this.$http.get('meetings')
+					.then (response => {
+						this.meetings = response.body
+					})
+					.catch(response =>this.failure('Błąd przy tworzeniu spotkania. Kod odpowiedzi: ' + response.status));
+			},
+			getMeetingsParticipants() {
+				for (meeting in this.meetings) {
+					this.$http.get('meetings/' + meeting.id + '/participants')
+					.then (response => {
+						meeting.participants = response.body;
+					})
+					.catch(response =>this.failure('Błąd przy pobieraniu uczestników. Kod odpowiedzi: ' + response.status));
+				}
+			}	
+        },
+		mounted() {
+			this.getMeetings();
+		}
     }
 </script>

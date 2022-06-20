@@ -94,9 +94,9 @@ public class MeetingRestController {
 //        if (meeting == null) {
 //            return new ResponseEntity("Meeting not found.", HttpStatus.NOT_FOUND);
 //        }
-        if (participants.size() < 1) {
-            return new ResponseEntity<>("Meeting has no participant.", HttpStatus.NOT_FOUND);
-        }
+//        if (participants.size() < 1) {
+//            return new ResponseEntity<>("Meeting has no participant.", HttpStatus.NOT_FOUND);
+//        }
         return new ResponseEntity<Collection<Participant>>(participants, HttpStatus.OK);
     }
 
